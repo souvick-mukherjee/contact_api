@@ -61,6 +61,12 @@ import path from 'path';
 
 dotenv.config();
 
+import { fileURLToPath } from 'url';
+import { dirname } from 'path';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
+
 const visitorSchema = new mongoose.Schema({
     name: String,
     email: String,
@@ -93,17 +99,31 @@ app.post('/api/users', async (req, res) => {
     res.status(201).json(newUser);
 });
 
-app.get('/api/download-pdf', (req, res) => {
-    const pdfPath = path.join(__dirname, 'public', 'output.pdf');
+// app.get('/api/download-pdf', (req, res) => {
+//     const pdfPath = path.join(__dirname, 'public', 'Souvick_Mukherjee_Internship_Offer_Letter (SIGNED).pdf');
 
-    const pdfDoc = new PDFDocument();
-    pdfDoc.pipe(fs.createWriteStream(pdfPath));
-    pdfDoc.text('Hello, this is your PDF content.');
-    pdfDoc.end();
+//     // const pdfDoc = new PDFDocument();
+//     // pdfDoc.pipe(fs.createWriteStream(pdfPath));
+//     // pdfDoc.text('Hello, this is your PDF content.');
+//     // pdfDoc.end();
 
-    res.download(pdfPath, 'output.pdf');
+//     res.download(pdfPath);
+// });
+app.get('/api/read-pdf', (req, res) => {
+    const pdfPath = path.join(__dirname, 'public', 'PDF.pdf');
+
+    try {
+        const fileStream = fs.createReadStream(pdfPath);
+
+        res.setHeader('Content-Type', 'application/pdf');
+        res.setHeader('Content-Disposition', 'inline; filename=PDF.pdf');
+
+        fileStream.pipe(res);
+    } catch (error) {
+        console.error('Error reading PDF:', error);
+        res.status(500).json({ error: 'Error reading PDF.' });
+    }
 });
-
 app.all('/api/*', (req, res) => {
     res.status(405).json({ message: 'Method Not Allowed' });
 });
