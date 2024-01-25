@@ -1,53 +1,115 @@
+// import express from 'express';
+// import mongoose from 'mongoose';
+// import dotenv from 'dotenv';
+// dotenv.config();
+// import cors from 'cors';
+
+
+// const visitorSchema=new mongoose.Schema({
+//     name:String,
+//     email:String,
+//     company:String,
+//     phoneNumber:String,
+//     message:String
+// });
+// console.log(process.env.DB_URL)
+// mongoose.connect(process.env.DB_URL, { useNewUrlParser: true, useUnifiedTopology: true })
+// .then(() => console.log('Connected to MongoDB'))
+// .catch(error => console.error('Error connecting to MongoDB:', error));
+
+
+// const Visitor=mongoose.model('Visitor',visitorSchema);
+// // let connect = async function () {
+// //     let isDone =  await mongoose.connect(process.env.DB_URL).then("DB connected")
+// //   }
+// // connect();
+
+// const app = express();
+// app.use(express.json());
+// app.use(cors());
+// // Define the User model
+
+// app.get("/api/users",(req,res)=>{
+//     res.send("API is running fine");
+// })
+
+// app.post('/api/users', async (req, res) => {
+//     const { name, email, company, phoneNumber, message } = req.body;
+//     console.log(req.body);
+//     // Create a new user using the User model
+//     const newUser = new Visitor(req.body);
+//     await newUser.save();
+//     res.status(201).json(newUser);
+// });
+
+// app.all('/api/*', (req, res) => {
+//     res.status(405).json({ message: 'Method Not Allowed' });
+// });
+// let port = process.env.PORT || 3000;
+// app.listen(port,()=>{
+//     console.log(`server is up on port ${port}`);
+// })
+
+// export default app;
 import express from 'express';
 import mongoose from 'mongoose';
 import dotenv from 'dotenv';
-dotenv.config();
 import cors from 'cors';
+import PDFDocument from 'pdfkit';
+import fs from 'fs';
+import path from 'path';
 
+dotenv.config();
 
-const visitorSchema=new mongoose.Schema({
-    name:String,
-    email:String,
-    company:String,
-    phoneNumber:String,
-    message:String
+const visitorSchema = new mongoose.Schema({
+    name: String,
+    email: String,
+    company: String,
+    phoneNumber: String,
+    message: String
 });
-console.log(process.env.DB_URL)
+
 mongoose.connect(process.env.DB_URL, { useNewUrlParser: true, useUnifiedTopology: true })
-.then(() => console.log('Connected to MongoDB'))
-.catch(error => console.error('Error connecting to MongoDB:', error));
+    .then(() => console.log('Connected to MongoDB'))
+    .catch(error => console.error('Error connecting to MongoDB:', error));
 
-
-const Visitor=mongoose.model('Visitor',visitorSchema);
-// let connect = async function () {
-//     let isDone =  await mongoose.connect(process.env.DB_URL).then("DB connected")
-//   }
-// connect();
+const Visitor = mongoose.model('Visitor', visitorSchema);
 
 const app = express();
 app.use(express.json());
 app.use(cors());
-// Define the User model
 
-app.get("/api/users",(req,res)=>{
+app.get("/api/users", (req, res) => {
     res.send("API is running fine");
-})
+});
 
 app.post('/api/users', async (req, res) => {
     const { name, email, company, phoneNumber, message } = req.body;
     console.log(req.body);
-    // Create a new user using the User model
+
     const newUser = new Visitor(req.body);
     await newUser.save();
+
     res.status(201).json(newUser);
+});
+
+app.get('/api/download-pdf', (req, res) => {
+    const pdfPath = path.join(__dirname, 'public', 'output.pdf');
+
+    const pdfDoc = new PDFDocument();
+    pdfDoc.pipe(fs.createWriteStream(pdfPath));
+    pdfDoc.text('Hello, this is your PDF content.');
+    pdfDoc.end();
+
+    res.download(pdfPath, 'output.pdf');
 });
 
 app.all('/api/*', (req, res) => {
     res.status(405).json({ message: 'Method Not Allowed' });
 });
-let port = process.env.PORT || 3000;
-app.listen(port,()=>{
-    console.log(`server is up on port ${port}`);
-})
 
+const port = process.env.PORT || 3000;
+app.listen(port, () => {
+    console.log(`Server is up on port ${port}`);
+});
 export default app;
