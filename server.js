@@ -100,7 +100,7 @@ app.post('/api/users', async (req, res) => {
 });
 
 // app.get('/api/download-pdf', (req, res) => {
-//     const pdfPath = path.join(__dirname, 'public', 'Souvick_Mukherjee_Internship_Offer_Letter (SIGNED).pdf');
+//     const pdfPath = path.join(__dirname, 'public', 'ShihaanTech_ebook.pdf');
 
 //     // const pdfDoc = new PDFDocument();
 //     // pdfDoc.pipe(fs.createWriteStream(pdfPath));
@@ -110,13 +110,13 @@ app.post('/api/users', async (req, res) => {
 //     res.download(pdfPath);
 // });
 app.get('/api/read-pdf', (req, res) => {
-    const pdfPath = path.join(__dirname, 'public', 'PDF.pdf');
+    const pdfPath = path.join(__dirname, 'public', 'ShihaanTech_ebook.pdf');
 
     try {
         const fileStream = fs.createReadStream(pdfPath);
 
         res.setHeader('Content-Type', 'application/pdf');
-        res.setHeader('Content-Disposition', 'inline; filename=PDF.pdf');
+        res.setHeader('Content-Disposition', 'inline; filename=ShihaanTech_ebook.pdf');
 
         fileStream.pipe(res);
     } catch (error) {
