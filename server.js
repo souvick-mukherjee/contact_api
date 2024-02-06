@@ -27,7 +27,7 @@ const pdfSchema = new mongoose.Schema({
     email: String
 })
 
-mongoose.connect(process.env.DB_URL, { useNewUrlParser: true, useUnifiedTopology: true })
+mongoose.connect(process.env.DB_URL)
     .then(() => console.log('Connected to MongoDB'))
     .catch(error => console.error('Error connecting to MongoDB:', error));
 
